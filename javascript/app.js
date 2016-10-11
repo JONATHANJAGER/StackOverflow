@@ -30,7 +30,7 @@ $(document).ready(function (){
 			'</a></p>' +
 			'<p>Reputation: ' + question.owner.reputation + '</p>'
 		);
-
+		
 		return result;
 	};
 
@@ -75,6 +75,7 @@ $(document).ready(function (){
 			//The function is executed once for each item in the array.
 			$.each(result.items, function(i, item) {
 				var question = showQuestion(item);
+			
 				$('.results').append(question);
 			});
 		})
@@ -96,8 +97,49 @@ $(document).ready(function (){
 		});
 	});
 
+	var showinspiration = function(question) {
+		
+		// clone our result template code
+		var result = $('.templates .question').clone();
+		
+		// Set the question properties in result
+		var questionElem = result.find('.question-text a');
+		questionElem.attr('href', question.link);
+		questionElem.text(question.title);
 
-	var getinspiration = function(tags) {
+		// set the date asked property in result
+		var asked = result.find('.asked-date');
+		var date = new Date(1000*question.creation_date);
+		asked.text(date.toString());
+
+		// set the .viewed for question property in result
+		var viewed = result.find('.viewed');
+		viewed.text(question.view_count);
+
+		// set some properties related to asker
+		var asker = result.find('.asker');
+		asker.html('<p>Name: <a target="_blank" '+
+			'href=http://stackoverflow.com/users/' + question.owner.user_id + ' >' +
+			question.owner.display_name +
+			'</a></p>' +
+			'<p>Reputation: ' + question.owner.reputation + '</p>'
+		);
+
+		return result;
+	};
+
+	var showSearchResults = function(query, resultNum) {
+		var results = resultNum + ' results for <strong>' + query + '</strong>';
+		return results;
+	};
+
+	var showError = function(error){
+		var errorElem = $('.templates .error').clone();
+		var errorText = '<p>' + error + '</p>';
+		errorElem.append(errorText);
+	};
+
+	var getinspiration = function(answer) {
 		
 		// the parameters we need to pass in our request to StackOverflow's API
 		var request = { 
@@ -108,7 +150,7 @@ $(document).ready(function (){
 		};
 		
 		$.ajax({
-			url: "/2.2/tags/order/top-answerers/all_time?site=stackoverflow",
+			url: "http://api.stackexchange.com/docs/top-answerers-on-tags#tag=java&period=all_time&filter=default&site=stackoverflow"
 			data: request,
 			dataType: "jsonp",//use jsonp to avoid cross origin issues
 			type: "GET",
@@ -116,11 +158,12 @@ $(document).ready(function (){
 		.done(function(result){ //this waits for the ajax to return with a succesful promise object
 			var searchResults = showSearchResults(request.tagged, result.items.length);
 
-			$('.search-results').html(searchResults);
+			//$('.search-results').html(searchResults);
 			//$.each is a higher order function. It takes an array and a function as an argument.
 			//The function is executed once for each item in the array.
 			$.each(result.items, function(i, item) {
-				var question = showQuestion(item);
+				var answerers = showQuestion(item);
+				console.log(item);
 				$('.results').append(question);
 			});
 		})
@@ -136,9 +179,9 @@ $(document).ready(function (){
 			e.preventDefault();
 			// zero out results if previous search has run
 			$('.results').html('');
-			// get the value of the tags the user submitted
-			var tags = $(this).find("input[name='tags']").val();
-			getUnanswered(tags);
+			// get the value of the answerers the user submitted
+			var tags = $(this).find("input[name='answerers']").val();
+			getinspiration(answerers);
 		});
 	});
 
@@ -146,3 +189,4 @@ $(document).ready(function (){
 
 
 });
+	
