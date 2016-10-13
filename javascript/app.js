@@ -139,18 +139,18 @@ $(document).ready(function (){
 		errorElem.append(errorText);
 	};
 
-	var getinspiration = function(answer) {
+	var getinspiration = function(answerers) {
 		
 		// the parameters we need to pass in our request to StackOverflow's API
 		var request = { 
-			tagged: tags,
+			tagged: answerers,
 			site: 'stackoverflow',
 			order: 'desc',
 			sort: 'creation'
 		};
 		
 		$.ajax({
-			url: "http://api.stackexchange.com/docs/top-answerers-on-tags#tag=java&period=all_time&filter=default&site=stackoverflow"
+			url: "http://api.stackexchange.com//2.2/tags/item/top-answerers/all_time?",
 			data: request,
 			dataType: "jsonp",//use jsonp to avoid cross origin issues
 			type: "GET",
@@ -180,7 +180,7 @@ $(document).ready(function (){
 			// zero out results if previous search has run
 			$('.results').html('');
 			// get the value of the answerers the user submitted
-			var tags = $(this).find("input[name='answerers']").val();
+			var answerers = $(this).find("input[name='answerers']").val();
 			getinspiration(answerers);
 		});
 	});
