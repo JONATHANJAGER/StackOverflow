@@ -119,10 +119,10 @@ $(document).ready(function (){
 		// set some properties related to asker
 		var asker = result.find('.asker');
 		asker.html('<p>Name: <a target="_blank" '+
-			'href=http://stackoverflow.com/users/' + question.owner.user_id + ' >' +
-			question.owner.display_name +
+			'href=http://stackoverflow.com/users/' + question.user.user_id + ' >' +
+			question.user.display_name +
 			'</a></p>' +
-			'<p>Reputation: ' + question.owner.reputation + '</p>'
+			'<p>Reputation: ' + question.user.reputation + '</p>'
 		);
 
 		return result;
@@ -143,14 +143,11 @@ $(document).ready(function (){
 		
 		// the parameters we need to pass in our request to StackOverflow's API
 		var request = { 
-			tagged: answerers,
-			site: 'stackoverflow',
-			order: 'desc',
-			sort: 'creation'
+			site: 'stackoverflow'
 		};
 		
 		$.ajax({
-			url: "http://api.stackexchange.com//2.2/tags/item/top-answerers/all_time?",
+			url: "http://api.stackexchange.com/2.2/tags/"+answerers+"/top-answerers/all_time?",
 			data: request,
 			dataType: "jsonp",//use jsonp to avoid cross origin issues
 			type: "GET",
@@ -158,13 +155,13 @@ $(document).ready(function (){
 		.done(function(result){ //this waits for the ajax to return with a succesful promise object
 			var searchResults = showSearchResults(request.tagged, result.items.length);
 
-			//$('.search-results').html(searchResults);
+			$('.search-results').html(searchResults);
 			//$.each is a higher order function. It takes an array and a function as an argument.
 			//The function is executed once for each item in the array.
 			$.each(result.items, function(i, item) {
-				var answerers = showQuestion(item);
-				console.log(item);
-				$('.results').append(question);
+				var answerers = showinspiration(item);
+				console.log(answerers);
+				$('.results').append(answerers);
 			});
 		})
 		.fail(function(jqXHR, error){ //this waits for the ajax to return with an error promise object
